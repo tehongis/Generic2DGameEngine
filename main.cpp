@@ -1,7 +1,9 @@
 
-#include <stdio>
+#include <iostream>
+
+using namespace std;
 
 int main() {
-stdio:out << "nakki";
-return 0;
+    cout << "nakki" <<endl;
+    return 0;
 }

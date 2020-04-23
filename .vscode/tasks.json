@@ -7,6 +7,7 @@
             "args": [
                 "-g",
                 "${file}",
+                "-lSDL2",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
             ],

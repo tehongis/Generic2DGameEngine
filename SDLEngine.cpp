@@ -13,7 +13,6 @@ int main()
     SDL_Window* window;
     SDL_Renderer* renderer;
 
-    // retutns zero on success else non-zero 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
         printf("ERR: Failed to initialize SDL: %s\n", SDL_GetError()); 
     } 
@@ -26,16 +25,13 @@ int main()
 
     int running = 1;
 
-    // annimation loop 
     while (running) { 
         SDL_Event event; 
   
-        // Events mangement 
         while (SDL_PollEvent(&event)) { 
             switch (event.type) { 
   
             case SDL_QUIT: 
-                // handling of close button 
                 running = 0; 
                 break;   
             } 

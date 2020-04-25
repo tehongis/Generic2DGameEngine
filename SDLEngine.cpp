@@ -9,16 +9,20 @@ using namespace std;
 
 int main() 
 { 
-    cout << "nakki" <<endl;
  
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+
     // retutns zero on success else non-zero 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
         printf("ERR: Failed to initialize SDL: %s\n", SDL_GetError()); 
     } 
-    SDL_Window* win = SDL_CreateWindow("Title goes here", 
+    window = SDL_CreateWindow("Title goes here", 
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
                                        800, 600, 0); 
+
+    renderer = SDL_CreateRenderer(window, -1, 0);
 
     int running = 1;
 
@@ -35,6 +39,13 @@ int main()
                 running = 0; 
                 break;   
             } 
+
+        SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255);
+        SDL_RenderClear(renderer);
+
+        SDL_RenderPresent(renderer);
+        SDL_Delay(100);
+
         } 
     }
 

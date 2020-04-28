@@ -32,3 +32,9 @@
 *.app
 main
 SDLEngine
+*.log
+*.tlog
+*.pdb
+*.ilk
+*.idb
+x64/Debug/SDLEngine.vcxproj.FileListAbsolute.txt

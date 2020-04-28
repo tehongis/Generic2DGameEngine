@@ -1,17 +1,21 @@
 
 #include <iostream>
 
-#include <SDL2/SDL.h> 
-#include <SDL2/SDL_image.h> 
-#include <SDL2/SDL_timer.h> 
+#include <SDL.h> 
+#include <SDL_events.h> 
+#include <SDL_timer.h> 
+#undef main
 
-using namespace std;
+#include <box2d/box2d.h>
+#undef main
 
-int main() 
-{ 
+int main() {
  
     SDL_Window* window;
     SDL_Renderer* renderer;
+
+    b2Vec2 gravity(0.0f, -10.0f);
+    b2World myWorld = b2World(gravity);
 
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) { 
         printf("ERR: Failed to initialize SDL: %s\n", SDL_GetError()); 
@@ -19,7 +23,7 @@ int main()
     window = SDL_CreateWindow("Title goes here", 
                                        SDL_WINDOWPOS_CENTERED, 
                                        SDL_WINDOWPOS_CENTERED, 
-                                       800, 600, 0); 
+                                       1280, 1024, 0); 
 
     renderer = SDL_CreateRenderer(window, -1, 0);
 
@@ -44,7 +48,7 @@ int main()
 
         } 
     }
-
+     
     SDL_Quit();
     return 0; 
 } 

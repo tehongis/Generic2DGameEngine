@@ -8,29 +8,85 @@
 #include <SDL2/SDL.h>
 #undef main
 
+/*
+From Box2D documentation:
+What are the biggest mistakes made by new users?
+Using pixels for length instead of meters.
+Expecting Box2D to give pixel perfect results.
+Using b2Polygon to create concave polygons.
+Testing their code in release mode.
+Not learning C++ before using Box2D.
+Not reading this FAQ. :)
+*/
 #include <Box2D/Box2D.h>
 #undef main
 
-#define WIDTH 1280
-#define HEIGHT 1024
-#define CX WIDTH/2
-#define CY HEIGHT/2
 
 int main() {
 
-  int running = 1;      //Assuming everything will go fine, this well keep as 1.
+  int running = 1;      // If this keep as 1, we have a go. Any init fails will set zero and let the program exit with error.
 
+  const int WIDTH = 1280;
+  const int HEIGHT = 1024;
+  const int CX = WIDTH / 2;
+  const int CY = HEIGHT / 2;
+  const int SCREEN_FPS = 60;
+  const int SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
+
+  SDL_Event event;
   SDL_Window *window = NULL;
   SDL_Renderer *renderer = NULL;
   SDL_Texture *sprite = NULL;
+  SDL_Rect texr;
+
   int w, h;
 
   float countA = 0.0;
   float countB = 0.4;
   float countC = 1.1;
 
+  //Current time start time
+  Uint32 startTime;
+
+  int before_ticks;
+  int current_ticks;
+
+  //world
   b2Vec2 gravity(0.0f, -10.0f);
-  b2World myWorld = b2World(gravity);
+  b2World world = b2World(gravity);
+
+
+  //ground
+  b2BodyDef groundBodyDef;
+  groundBodyDef.position.Set(0.0f, -10.0f);
+
+  b2Body* groundBody = world.CreateBody(&groundBodyDef);
+  
+  b2PolygonShape groundBox;
+  groundBox.SetAsBox(50.0f, 10.0f);
+  groundBody->CreateFixture(&groundBox, 0.0f);
+
+  //ship
+  b2BodyDef bodyDef;
+  bodyDef.type = b2_dynamicBody;
+  bodyDef.position.Set(0.0f, 4.0f);
+  b2Body* body = world.CreateBody(&bodyDef);
+
+  b2PolygonShape dynamicBox;
+  dynamicBox.SetAsBox(1.0f, 1.0f);
+
+  b2FixtureDef fixtureDef;
+  fixtureDef.shape = &dynamicBox;
+  fixtureDef.density = 1.0f;
+  fixtureDef.friction = 0.3f;
+
+  body->CreateFixture(&fixtureDef);
+
+  // simulation settings
+  float timeStep = 1.0f / 60.0f;
+
+  int32 velocityIterations = 6;
+  int32 positionIterations = 2;
 
   if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
     printf("ERR: Failed to initialize SDL: %s\n", SDL_GetError());
@@ -52,9 +108,9 @@ int main() {
   }
   
   SDL_QueryTexture(sprite, NULL, NULL, &w, &h);
-  SDL_Rect texr;
-
-  SDL_Event event;
+  
+  current_ticks = SDL_GetTicks();
+  before_ticks = current_ticks;
 
   while (running) {
 
@@ -72,6 +128,14 @@ int main() {
       printf("Escape is pressed.\n");
       running = 0;
     }
+
+
+    // simulate world
+    world.Step(timeStep, velocityIterations, positionIterations);
+    b2Vec2 position = body->GetPosition();
+    float angle = body->GetAngle();
+    printf("%4.2f %4.2f %4.2f\n", position.x, position.y, angle);
+
 
     SDL_SetRenderDrawColor(renderer, 30, 40, 50, 255);
     SDL_RenderClear(renderer);
@@ -91,7 +155,6 @@ int main() {
         countC = countC - M_PI * 2;
     }
 
-
     for (int i = 0; i < 512; i++) {
         float f = (i / 100.0);
         texr.x = int( CX + 200 * ( sin( countA + f ) + sin( countB + f ) + sin(countC + f) ) );
@@ -105,7 +168,10 @@ int main() {
     }
 
     SDL_RenderPresent(renderer);
-    SDL_Delay(25);
+    current_ticks = SDL_GetTicks();
+    printf("Ticks: %d",current_ticks-before_ticks);
+    before_ticks = current_ticks;
+    SDL_Delay(50);
   }
 
   SDL_DestroyTexture(sprite);
